@@ -2,9 +2,10 @@ package conf
 
 import (
 	"context"
-	"database/sql"
 	"fmt"
-	_ "github.com/go-sql-driver/mysql"
+	"github.com/xie392/restful-api/apps/host"
+	"gorm.io/driver/mysql"
+	"gorm.io/gorm"
 	"sync"
 	"time"
 )
@@ -22,12 +23,7 @@ import (
 var config *Config
 
 // 全局MySQL 客户端实例
-var db *sql.DB
-
-// C 要想获取配置, 单独提供函数。全局Config对象获取函数
-func C() *Config {
-	return config
-}
+var db *gorm.DB
 
 // Config 应用配置
 // 通过封装为一个对象, 来与外部配置进行对接
@@ -114,11 +110,8 @@ func NewDefaultConfig() *Config {
 	}
 }
 
-// getDBConn 连接池, driverConn具体的连接对象, 他维护着一个Socket
-// pool []*driverConn, 维护pool里面的连接都是可用的, 定期检查我们的conn健康情况
-// 某一个driverConn已经失效, driverConn.Reset(), 清空该结构体的数据, Recon 获取一个连接, 让该conn借壳存活
-// 避免driverConn结构体的内存申请和释放的一个成本
-func (m *MySQL) getDBConn() (*sql.DB, error) {
+// getDBConn 获取 MySQL 连接
+func (m *MySQL) getDBConn() (*gorm.DB, error) {
 	var err error
 	dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8&multiStatements=true",
 		m.UserName,
@@ -126,41 +119,55 @@ func (m *MySQL) getDBConn() (*sql.DB, error) {
 		m.Host,
 		m.Port,
 		m.Database)
-	db, err := sql.Open("mysql", dsn)
+
+	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{
+		PrepareStmt: true, // 为了更好的性能，启用预编译语句
+	})
+
+	err = host.AutoMigrateResource(db)
+	err = host.AutoMigrateDescribe(db)
+
 	if err != nil {
 		return nil, fmt.Errorf("connect to mysql<%s> error, %s", dsn, err.Error())
 	}
 
-	db.SetMaxOpenConns(m.MaxOpenConn)
-	db.SetMaxIdleConns(m.MaxIdleConn)
-	db.SetConnMaxLifetime(time.Second * time.Duration(m.MaxLifeTime))
-	db.SetConnMaxIdleTime(time.Second * time.Duration(m.MaxIdleTime))
+	sqlDB, err := db.DB()
+	if err != nil {
+		return nil, fmt.Errorf("get underlying SQL DB error, %s", err.Error())
+	}
+
+	// 设置连接池配置
+	sqlDB.SetMaxOpenConns(m.MaxOpenConn)
+	sqlDB.SetMaxIdleConns(m.MaxIdleConn)
+	sqlDB.SetConnMaxLifetime(time.Second * time.Duration(m.MaxLifeTime))
+	sqlDB.SetConnMaxIdleTime(time.Second * time.Duration(m.MaxIdleTime))
+
+	// 测试连接
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
-	if err := db.PingContext(ctx); err != nil {
+	if err := sqlDB.PingContext(ctx); err != nil {
 		return nil, fmt.Errorf("ping mysql<%s> error, %s", dsn, err.Error())
 	}
+
 	return db, nil
 }
 
-// GetDB 获取MySQL 客户端实例
-//  1. 第一种方式, 使用 LoadGlobal 在加载时 初始化全局db实例
-//  2. 第二种方式, 惰性加载, 获取 DB 时，动态判断再初始化
-func (m *MySQL) GetDB() *sql.DB {
-	// 直接加锁, 锁住临界区
-	m.lock.Lock()
-	// 释放锁，解锁临界区
-	defer m.lock.Unlock()
+// C 要想获取配置, 单独提供函数。全局Config对象获取函数
+func C() *Config {
+	return config
+}
 
-	// 如果实例不存在, 就初始化一个新的实例
+// GetDB 获取 MySQL 客户端实例
+func (m *MySQL) GetDB() *gorm.DB {
 	if db == nil {
+		// 调用 getDBConn 方法获取数据库连接
 		conn, err := m.getDBConn()
 		if err != nil {
+			// 如果获取连接出错，则抛出 panic
 			panic(err)
 		}
+		// 将获取到的连接赋值给全局变量 db
 		db = conn
 	}
-
-	// 全局变量db就一定存在了
 	return db
 }

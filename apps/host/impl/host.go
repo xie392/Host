@@ -11,7 +11,7 @@ func (i *HostServiceImpl) CreateHost(ctx context.Context, ins *host.Host) (*host
 	return nil, nil
 }
 
-func (i *HostServiceImpl) QueryHost(ctx context.Context, req *host.QueryHostRequest) (*host.HostSet, error) {
+func (i *HostServiceImpl) QueryHost(ctx context.Context, req *host.QueryHostRequest) (*host.ListHost, error) {
 	return nil, nil
 }
 
