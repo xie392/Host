@@ -6,6 +6,8 @@ import (
 )
 
 func (i *HostServiceImpl) CreateHost(ctx context.Context, ins *host.Host) (*host.Host, error) {
+	i.l.Info("CreateHost", "host", ins)
+	i.l.Debugf("CreateHost: %v", ins)
 	return nil, nil
 }
 

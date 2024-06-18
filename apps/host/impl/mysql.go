@@ -7,9 +7,9 @@ import (
 )
 
 // 接口实现的静态方法
-var _ host.Service = (*HostServiceImpl)(nil)
+//var _ host.Service = (*HostServiceImpl)(nil)
 
-func NewHostService(l logger.Logger) host.Service {
+func NewHostService() host.Service {
 	// Host service 服务的子 Loggger
 	// 封装的Zap让其满足 Logger接口
 	return &HostServiceImpl{l: zap.L().Named("Host")}

@@ -5,13 +5,6 @@ type HostSet struct {
 	Items []*Host `json:"items"`
 }
 
-func NewHost() *Host {
-	return &Host{
-		Resource: &Resource{},
-		Describe: &Describe{},
-	}
-}
-
 type Host struct {
 	*Resource // 资源公共属性部分
 	*Describe // 资源独有属性部分
@@ -68,4 +61,11 @@ type DeleteHostRequest struct {
 
 type DescribeHostRequest struct {
 	Id string `json:"id"`
+}
+
+func NewHost() *Host {
+	return &Host{
+		Resource: &Resource{},
+		Describe: &Describe{},
+	}
 }
