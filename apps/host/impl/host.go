@@ -8,6 +8,14 @@ import (
 )
 
 func (i *HostServiceImpl) CreateHost(ctx context.Context, ins *host.Host) (*host.Host, error) {
+	// 生成id
+	//ins.Id = utils.GenerateId(8)
+	//ins.ResourceID = ins.Id
+
+	// 添加创建时间
+	//ins.CreateAt = time.Now().Unix()
+	//ins.UpdateAt = ins.CreateAt
+
 	// 插入资源和描述
 	insertResource := func(tx *gorm.DB) error {
 		return tx.Create(ins.Resource).Error

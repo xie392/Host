@@ -12,6 +12,11 @@ docker run --name host-mysql -e MYSQL_ROOT_PASSWORD=123456 -e MYSQL_DATABASE=hos
 后续有需要可以直接使用 docker start host-mysql 命令启动 mysql 容器。
 
 
+# 启动
+
+```shell
+go run main.go start
+```
 
 # 目录介绍
 

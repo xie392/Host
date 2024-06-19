@@ -1,5 +1,13 @@
 package main
 
+import (
+	"fmt"
+	"github.com/xie392/restful-api/cmd"
+)
+
 func main() {
-	println("Hello, world!")
+	if err := cmd.RootCmd.Execute(); err != nil {
+		fmt.Println(err)
+	}
+	fmt.Println("Bye!")
 }

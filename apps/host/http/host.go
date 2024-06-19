@@ -15,18 +15,18 @@ func (h *Handler) createHost(c *gin.Context) {
 	// json unmarshal
 	// 用户传递过来的参数进行解析, 实现了一个json 的unmarshal
 	if err := c.Bind(ins); err != nil {
-		utils.ErrorResponse(c, http.StatusBadRequest, err.Error())
+		utils.ErrorResponse(c, http.StatusBadRequest, "Invalid request body")
 		return
 	}
 
 	// 进行接口调用, 返回 肯定有成功或者失败
 	ins, err := h.svc.CreateHost(c.Request.Context(), ins)
 	if err != nil {
-		utils.ErrorResponse(c, http.StatusInternalServerError, err.Error())
+		utils.ErrorResponse(c, http.StatusInternalServerError, "Internal server error")
 		return
 	}
 
-	// 成功, 把对象实例返回给HTTP API调用方
+	// 成功, 把对象实例返回给HTTP API调用
 	utils.SuccessResponse(c, ins)
 }
 

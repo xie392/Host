@@ -192,3 +192,7 @@ func TransferFunds(db *gorm.DB, operations ...func(*gorm.DB) error) error {
 
 	return tx.Commit().Error
 }
+
+func (a *App) HttpAddr() string {
+	return fmt.Sprintf("%s:%s", a.Host, a.Port)
+}

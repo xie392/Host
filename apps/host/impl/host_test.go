@@ -23,11 +23,11 @@ func TestCreate(t *testing.T) {
 	ins := host.NewHost()
 
 	// 设置Host的属性
-	ins.Id = "test-02"
+	//ins.Id = "test-03"
 	ins.Region = "广州"
 	ins.Type = "small"
 	ins.Name = "接口测试主机"
-	ins.ResourceID = "test-02"
+	//ins.ResourceID = "test-03"
 	ins.CPU = 1
 	ins.Memory = 2048
 
