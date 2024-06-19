@@ -18,13 +18,19 @@ var (
 
 func TestCreate(t *testing.T) {
 	should := assert.New(t)
+
+	// 创建一个Host实例
 	ins := host.NewHost()
-	ins.Id = "ins-01"
-	ins.Name = "test"
-	ins.Region = "cn-hangzhou"
-	ins.Type = "sm1"
+
+	// 设置Host的属性
+	ins.Id = "test-02"
+	ins.Region = "广州"
+	ins.Type = "small"
+	ins.Name = "接口测试主机"
+	ins.ResourceID = "test-02"
 	ins.CPU = 1
 	ins.Memory = 2048
+
 	ins, err := service.CreateHost(context.Background(), ins)
 	if should.NoError(err) {
 		fmt.Println(ins)
@@ -85,7 +91,8 @@ func TestCreate(t *testing.T) {
 
 func TestInit(t *testing.T) {
 	// 测试用例的配置文件
-	err := conf.LoadConfigFromEnv()
+	//err := conf.LoadConfigFromEnv()
+	err := conf.LoadConfigFromToml("../../../etc/config.toml")
 	if err != nil {
 		panic(err)
 	}

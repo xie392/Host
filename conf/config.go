@@ -159,15 +159,36 @@ func C() *Config {
 
 // GetDB 获取 MySQL 客户端实例
 func (m *MySQL) GetDB() *gorm.DB {
+	// 加锁, 保证线程安全
+	m.lock.Lock()
+	defer m.lock.Unlock()
+
 	if db == nil {
-		// 调用 getDBConn 方法获取数据库连接
 		conn, err := m.getDBConn()
 		if err != nil {
-			// 如果获取连接出错，则抛出 panic
 			panic(err)
 		}
-		// 将获取到的连接赋值给全局变量 db
 		db = conn
 	}
+
 	return db
+}
+
+// TransferFunds 事务处理
+func TransferFunds(db *gorm.DB, operations ...func(*gorm.DB) error) error {
+	tx := db.Begin()
+	defer func() {
+		if r := recover(); r != nil {
+			tx.Rollback()
+		}
+	}()
+
+	for _, op := range operations {
+		if err := op(tx); err != nil {
+			tx.Rollback()
+			return err
+		}
+	}
+
+	return tx.Commit().Error
 }
