@@ -3,6 +3,8 @@ package host
 import (
 	"github.com/xie392/restful-api/pkg/utils"
 	"gorm.io/gorm"
+	"net/http"
+	"strconv"
 	"time"
 )
 
@@ -55,7 +57,33 @@ type Describe struct {
 }
 
 type QueryHostRequest struct {
-	Id string `json:"id"`
+	PageSize   int    `json:"page_size"`
+	PageNumber int    `json:"page_number"`
+	Keywords   string `json:"keywords"`
+}
+
+func NewQueryHostRequest() *QueryHostRequest {
+	return &QueryHostRequest{
+		PageSize:   20,
+		PageNumber: 1,
+	}
+}
+
+func NewQueryHostFromHTTP(r *http.Request) *QueryHostRequest {
+	req := NewQueryHostRequest()
+	qs := r.URL.Query()
+	pss := qs.Get("page_size")
+	if pss != "" {
+		req.PageSize, _ = strconv.Atoi(pss)
+	}
+
+	pns := qs.Get("page_number")
+	if pns != "" {
+		req.PageNumber, _ = strconv.Atoi(pns)
+	}
+
+	req.Keywords = qs.Get("keywords")
+	return req
 }
 
 type UpdateHostRequest struct {
@@ -84,6 +112,26 @@ func NewHost() *Host {
 		},
 	}
 }
+
+//func NewHostFrom(r *http.Request) *Host {
+//	req := NewQueryHostRequest()
+//	qs := r.URL.Query()
+//	pss := qs.Get("page_size")
+//	if pss != "" {
+//		req.PageSize, _ = strconv.Atoi(pss)
+//	}
+//
+//	pns := qs.Get("page_number")
+//	if pns != "" {
+//		req.PageNumber, _ = strconv.Atoi(pns)
+//	}
+//
+//	req.Keywords = qs.Get("keywords")
+//	return req
+//req := NewHost()
+//id := utils.GenerateId(8)
+//createAt := time.Now().Unix()
+//}
 
 func (Resource) TableName() string {
 	return "resource"

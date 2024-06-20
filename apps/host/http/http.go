@@ -23,6 +23,14 @@ func (h *Handler) Config() {
 	h.svc = apps.HostService
 }
 
+func (h *Handler) Name() string {
+	return host.AppName
+}
+
+func init() {
+	apps.RegistryGin(handler)
+}
+
 func (h *Handler) Registry(r gin.IRouter) {
 	r.POST("/hosts", h.createHost)
 	//r.GET("/hosts", h.queryHost)

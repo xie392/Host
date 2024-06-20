@@ -68,11 +68,10 @@ func LoadedGinApps() (names []string) {
 	for k := range ginApps {
 		names = append(names, k)
 	}
-
 	return
 }
 
-// InitGin 用户初始�?注册到Ioc容器里面的所有服�?
+// InitGin 用户初始 注册到Ioc容器里面的所有服务
 func InitGin(r gin.IRouter) {
 	// 先初始化好所有对
 	for _, v := range ginApps {

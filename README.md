@@ -18,6 +18,13 @@ docker run --name host-mysql -e MYSQL_ROOT_PASSWORD=123456 -e MYSQL_DATABASE=hos
 go run main.go start
 ```
 
+# 构建
+
+```shell
+go build -o host-server main.go
+```
+
+
 # 目录介绍
 
 ```
