@@ -3,8 +3,9 @@ package cmd
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/spf13/cobra"
+	"github.com/xie392/restful-api/apps"
+	_ "github.com/xie392/restful-api/apps/all"
 	"github.com/xie392/restful-api/apps/host/http"
-	"github.com/xie392/restful-api/apps/host/impl"
 	"github.com/xie392/restful-api/conf"
 )
 
@@ -32,10 +33,15 @@ var StartCmd = &cobra.Command{
 		//}
 
 		// 加载 Host Server 实体
-		service := impl.NewHostService()
+		//service := impl.NewHostService()
+		//apps.InitGin(r)
 
+		// 如何执行HostService的config方法
+		// 因为 apps.HostService是一个host.Service接口, 并没有 保存实例初始化(Config)的方法
 		// 启动 Host Server
-		api := http.NewHostHttpHandler(service)
+		apps.InitImpl()
+		api := http.NewHostHttpHandler()
+		api.Config()
 
 		// 注册路由
 		r := gin.Default()

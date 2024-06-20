@@ -2,6 +2,7 @@ package http
 
 import (
 	"github.com/gin-gonic/gin"
+	"github.com/xie392/restful-api/apps"
 	"github.com/xie392/restful-api/apps/host"
 )
 
@@ -14,8 +15,12 @@ type Handler struct {
 	svc host.Service
 }
 
-func NewHostHttpHandler(svc host.Service) *Handler {
-	return &Handler{svc: svc}
+func NewHostHttpHandler() *Handler {
+	return &Handler{}
+}
+
+func (h *Handler) Config() {
+	h.svc = apps.HostService
 }
 
 func (h *Handler) Registry(r gin.IRouter) {

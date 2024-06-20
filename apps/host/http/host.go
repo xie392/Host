@@ -1,6 +1,7 @@
 package http
 
 import (
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/xie392/restful-api/apps/host"
 	"github.com/xie392/restful-api/pkg/utils"
@@ -15,6 +16,7 @@ func (h *Handler) createHost(c *gin.Context) {
 	// json unmarshal
 	// 用户传递过来的参数进行解析, 实现了一个json 的unmarshal
 	if err := c.Bind(ins); err != nil {
+		fmt.Println("Invalid request body", err)
 		utils.ErrorResponse(c, http.StatusBadRequest, "Invalid request body")
 		return
 	}
